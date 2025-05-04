@@ -30,6 +30,11 @@ else:
 app = Flask(__name__)
 CORS(app)
 
+# Добавляем маршрут для корневого пути
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Welcome to Keynest API! Use /generate to create a password or /check to evaluate a password."}), 200
+
 @app.route('/generate', methods=['POST'])
 def generate_password():
     try:
@@ -147,5 +152,6 @@ def is_in_leaked_database(password):
     return 0 
 
 if __name__ == '__main__':
-    port = int(os.getenv("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=port)
+    # Используем порт из переменной окружения PORT, заданной Render
+    port = int(os.getenv("PORT", 5000))  # По умолчанию 5000, если PORT не задан
+    app.run(debug=False, host="0.0.0.0", port=port)  # Слушаем на 0.0.0.0 для Render
