@@ -5,7 +5,6 @@ import re
 import hashlib
 import requests
 import os
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 # Загружаем данные из секретов
 secret_syllables = os.getenv("SYLLABLES_DATA", "")
@@ -29,7 +28,16 @@ else:
     YEARS_MEANING = {}
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "https://mtferma.github.io",  # URL вашего GitHub Pages
+            "http://localhost:3000"            # Для локальной разработки
+        ],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Добавляем маршрут для корневого пути
 @app.route('/', methods=['GET'])
