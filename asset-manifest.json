@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/keynest/static/css/main.b6d75773.css",
+    "main.js": "/keynest/static/js/main.bb533e8e.js",
+    "static/js/453.55b2f67b.chunk.js": "/keynest/static/js/453.55b2f67b.chunk.js",
+    "index.html": "/keynest/index.html",
+    "main.b6d75773.css.map": "/keynest/static/css/main.b6d75773.css.map",
+    "main.bb533e8e.js.map": "/keynest/static/js/main.bb533e8e.js.map",
+    "453.55b2f67b.chunk.js.map": "/keynest/static/js/453.55b2f67b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b6d75773.css",
+    "static/js/main.bb533e8e.js"
+  ]
+}
