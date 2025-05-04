@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import "../styles/check.css";
+import { API_URL } from '../config';
 
 function Check() {
   const [password, setPassword] = useState("");
