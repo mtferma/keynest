@@ -5,11 +5,6 @@ import re
 import hashlib
 import requests
 import os
-<<<<<<< HEAD
-=======
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
->>>>>>> 15e4175a7134bd0286b0f7beaf3536108170e077
-
 # Загружаем данные из секретов
 secret_syllables = os.getenv("SYLLABLES_DATA", "")
 secret_years = os.getenv("YEARS_DATA", "")
@@ -167,8 +162,5 @@ def is_in_leaked_database(password):
 if __name__ == '__main__':
     # Используем порт из переменной окружения PORT, заданной Render
     port = int(os.getenv("PORT", 5000))  # По умолчанию 5000, если PORT не задан
-<<<<<<< HEAD
     app.run(debug=False, host="0.0.0.0", port=port)  # Слушаем на 0.0.0.0 для Render
-=======
-    app.run(debug=False, host="0.0.0.0", port=port)  # Слушаем на 0.0.0.0 для Render
->>>>>>> 15e4175a7134bd0286b0f7beaf3536108170e077
+
