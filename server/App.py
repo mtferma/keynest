@@ -13,6 +13,7 @@ app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
         "origins": [
+            "https://keynest.ru",
             "https://mtferma.github.io",
             "http://localhost:3000"
         ],
