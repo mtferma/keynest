@@ -1,11 +1,12 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Generate from "./pages/Generate";
 import Donate from "./pages/Donate"
 import Check from "./pages/check";
 
 function App() {
+  const API_URL = "https://keynest.onrender.com";
   return (
     <Router>
       <Routes>

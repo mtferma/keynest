@@ -2,7 +2,11 @@
   "name": "keynest",
   "version": "0.1.0",
   "private": true,
+<<<<<<< HEAD
   "homepage": "https://ваш-username.github.io/ваш-репозиторий", 
+=======
+  "homepage": "https://ваш-username.github.io/ваш-репозиторий",  // ← Добавьте эту строку!
+>>>>>>> 15e4175a7134bd0286b0f7beaf3536108170e077
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
