@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Generate.css";
 import Navigation from "../components/Navigation";
+import { API_URL } from '../config';
 
 function App() {
   const [value, setValue] = useState(5);
@@ -24,7 +25,7 @@ function App() {
   const generatePassword = async () => {
     try {
       // Запрос на сервер для генерации пароля
-      const response = await fetch("http://localhost:5000/generate", {
+      const response = await fetch(`${API_URL}/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

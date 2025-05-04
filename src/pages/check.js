@@ -7,7 +7,7 @@ function Check() {
   const [result, setResult] = useState(null);
 
   const handleCheck = async () => {
-  const response = await fetch("http://localhost:5000/check", {
+    const response = await fetch(`${API_URL}/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password }),
