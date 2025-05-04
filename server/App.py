@@ -5,6 +5,7 @@ import re
 import hashlib
 import requests
 import os
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 # Загружаем данные из секретов
 secret_syllables = os.getenv("SYLLABLES_DATA", "")
