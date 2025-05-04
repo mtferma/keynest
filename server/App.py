@@ -4,12 +4,31 @@ import random
 import re
 import hashlib
 import requests
-from syllables_data import SYLLABLES_TWO, SYLLABLES_THREE
-from data_data import YEARS_MEANING
+import os
+
+# Загружаем данные из секретов
+secret_syllables = os.getenv("SYLLABLES_DATA", "")
+secret_years = os.getenv("YEARS_DATA", "")
+
+# Инициализируем словари
+if secret_syllables:
+    exec_globals = {}
+    exec(secret_syllables, exec_globals)
+    SYLLABLES_TWO = exec_globals.get("SYLLABLES_TWO", {})
+    SYLLABLES_THREE = exec_globals.get("SYLLABLES_THREE", {})
+else:
+    SYLLABLES_TWO = {}
+    SYLLABLES_THREE = {}
+
+if secret_years:
+    exec_globals = {}
+    exec(secret_years, exec_globals)
+    YEARS_MEANING = exec_globals.get("YEARS_MEANING", {})
+else:
+    YEARS_MEANING = {}
 
 app = Flask(__name__)
 CORS(app)
-
 
 @app.route('/generate', methods=['POST'])
 def generate_password():
@@ -26,7 +45,6 @@ def generate_password():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/check', methods=['POST'])
 def check_password():
     try:
@@ -37,7 +55,6 @@ def check_password():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 def generate_password_logic(syllables, include_numbers, include_symbols):
     syllables_list = []
@@ -66,7 +83,6 @@ def generate_password_logic(syllables, include_numbers, include_symbols):
         associations.append("спецсимвол")
 
     return password, associations
-
 
 def evaluate_password(password):
     score = 1
@@ -111,7 +127,6 @@ def evaluate_password(password):
         "suggestion": " ".join(suggestions) if suggestions else None
     }
 
-
 def is_in_leaked_database(password):
     sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
     prefix = sha1[:5]
@@ -130,8 +145,6 @@ def is_in_leaked_database(password):
             return int(count) 
 
     return 0 
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
