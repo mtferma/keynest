@@ -6,7 +6,7 @@ import Donate from "./pages/Donate"
 import Check from "./pages/check";
 
 function App() {
-  const API_URL = "https://keynest.onrender.com";
+  const API_URL = "https://keynest-was2.onrender.com";
   return (
     <Router>
       <Routes>
