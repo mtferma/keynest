@@ -23,13 +23,25 @@ CORS(app, resources={
 
 # Логируем запуск приложения
 app.logger.debug("Starting Flask application...")
+def load_secret_file(path):
+    try:
+        with open(path, "r") as f:
+            return f.read()
+    except Exception as e:
+        app.logger.error(f"Failed to read secret file at {path}: {e}")
+        return ""
 
-# Загружаем данные из секретов
-secret_syllables = os.getenv("SYLLABLES_DATA", "")
-secret_years = os.getenv("YEARS_DATA", "")
+# Пути к секретным файлам
+SYLLABLES_PATH = "/etc/secrets/SYLLABLES_DATA"
+YEARS_PATH = "/etc/secrets/YEARS_DATA"
+
+# Загрузка данных
+secret_syllables = load_secret_file(SYLLABLES_PATH)
+secret_years = load_secret_file(YEARS_PATH)
+
+# Логгирование успешности загрузки
 app.logger.debug(f"Loaded SYLLABLES_DATA: {bool(secret_syllables)}")
 app.logger.debug(f"Loaded YEARS_DATA: {bool(secret_years)}")
-
 # Инициализируем словари
 try:
     if secret_syllables:
