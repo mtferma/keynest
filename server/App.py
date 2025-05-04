@@ -4,6 +4,7 @@ import random
 import re
 import hashlib
 import requests
+import os
 from syllables_data import SYLLABLES_TWO, SYLLABLES_THREE
 from data_data import YEARS_MEANING
 
@@ -132,6 +133,7 @@ def is_in_leaked_database(password):
     return 0 
 
 
-
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Используем порт из переменной окружения PORT, заданной Render
+    port = int(os.getenv("PORT", 5000))  # По умолчанию 5000, если PORT не задан
+    app.run(debug=False, host="0.0.0.0", port=port)  # Слушаем на 0.0.0.0 для Render
