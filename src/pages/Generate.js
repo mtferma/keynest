@@ -152,7 +152,7 @@ function App() {
         <p>© 2025 Keynest</p>
         <a href="https://github.com/mtferma/keynest" target="_blank" rel="noopener noreferrer">GitHub</a> | 
         <a href="https://t.me/keynest_support" target="_blank" rel="noopener noreferrer">Telegram Support</a> | 
-        <a href="http://localhost:3000/donate" target="_blank" rel="noopener noreferrer">Donate</a>    
+        <a href="http://keynest.ru/donate" target="_blank" rel="noopener noreferrer">Donate</a>    
       </footer>
     </div>
   );
