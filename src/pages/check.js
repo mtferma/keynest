@@ -32,7 +32,16 @@ function Check() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button onClick={handleCheck}>Проверить</button>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+  <button onClick={handleCheck}>Проверить</button>
+  <div className="tooltip-container">
+    <span className="tooltip-icon">?</span>
+    <div className="tooltip-text">
+      Мы проверяем пароль по базе утечек, оцениваем его длину, наличие цифр, символов и шаблонов. Все данные остаются на клиенте.
+    </div>
+  </div>
+</div>
+
       </div>
 
       {result && (
