@@ -76,29 +76,29 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate_password():
-    seed_suffix = ''
-    if seed:
-        try:
-            translated = GoogleTranslator(source='auto', target='en').translate(seed)
-            seed_suffix = translated[:3].lower()
-            app.logger.debug(f"Seed '{seed}' translated to '{translated}', using suffix '{seed_suffix}'")
-        except Exception as e:
-            app.logger.warning(f"Seed translation failed: {e}")
     try:
         app.logger.debug("Received /generate request")
         data = request.get_json()
         if not data:
             app.logger.error("No JSON data received")
             return jsonify({'error': 'No JSON data received'}), 400
-        
-        seed = data.get('seed', '').strip()
 
-        app.logger.debug(f"Request data: {data}")
+        seed = data.get('seed', '').strip()
         syllables = int(data.get('syllables', 2))
         include_numbers = data.get('numbers', False)
         include_symbols = data.get('symbols', False)
 
+        app.logger.debug(f"Request data: {data}")
         app.logger.debug(f"Parsed: syllables={syllables}, numbers={include_numbers}, symbols={include_symbols}")
+
+        seed_suffix = ''
+        if seed:
+            try:
+                translated = GoogleTranslator(source='auto', target='en').translate(seed)
+                seed_suffix = translated[:3].lower()
+                app.logger.debug(f"Seed '{seed}' translated to '{translated}', using suffix '{seed_suffix}'")
+            except Exception as e:
+                app.logger.warning(f"Seed translation failed: {e}")
 
         if not SYLLABLES_TWO or not SYLLABLES_THREE:
             app.logger.error("SYLLABLES_TWO or SYLLABLES_THREE is empty")
@@ -110,7 +110,7 @@ def generate_password():
         password, associations = generate_password_logic(
             syllables, include_numbers, include_symbols, seed_suffix
         )
-        
+
         return jsonify({'password': password, 'associations': associations}), 200
 
     except ValueError as ve:
@@ -119,6 +119,7 @@ def generate_password():
     except Exception as e:
         app.logger.error(f"Error in /generate: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
     
     
 def generate_password_logic(syllables, include_numbers, include_symbols, seed_suffix=""):
