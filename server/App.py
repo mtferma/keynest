@@ -1,14 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from deep_translator import GoogleTranslator
 import random
 import re
 import hashlib
 import requests
 import os
-import logging
-from deep_translator import GoogleTranslator
 
-logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
@@ -22,119 +20,93 @@ CORS(app, resources={
     }
 })
 
-app.logger.debug("Starting Flask application...")
-def load_secret_file(path):
-    try:
-        with open(path, "r") as f:
-            return f.read()
-    except Exception as e:
-        app.logger.error(f"Failed to read secret file at {path}: {e}")
-        return ""
-
 SYLLABLES_PATH = "/etc/secrets/SYLLABLES_DATA"
 YEARS_PATH = "/etc/secrets/YEARS_DATA"
 
-secret_syllables = load_secret_file(SYLLABLES_PATH)
-secret_years = load_secret_file(YEARS_PATH)
-
-app.logger.debug(f"Loaded SYLLABLES_DATA: {bool(secret_syllables)}")
-app.logger.debug(f"Loaded YEARS_DATA: {bool(secret_years)}")
-
-try:
-    if secret_syllables:
+def load_and_exec_secret(path, default_dict_name):
+    try:
+        with open(path, "r") as f:
+            code = f.read()
         exec_globals = {}
-        exec(secret_syllables, exec_globals)
-        SYLLABLES_TWO = exec_globals.get("SYLLABLES_TWO", {})
-        SYLLABLES_THREE = exec_globals.get("SYLLABLES_THREE", {})
-        app.logger.debug(f"SYLLABLES_TWO keys: {list(SYLLABLES_TWO.keys())}")
-        app.logger.debug(f"SYLLABLES_THREE keys: {list(SYLLABLES_THREE.keys())}")
-    else:
-        SYLLABLES_TWO = {}
-        SYLLABLES_THREE = {}
-        app.logger.warning("SYLLABLES_DATA is empty")
-except Exception as e:
-    app.logger.error(f"Error loading SYLLABLES_DATA: {str(e)}")
-    raise
+        exec(code, exec_globals)
+        return exec_globals.get(default_dict_name, {})
+    except Exception:
+        return {}
 
-try:
-    if secret_years:
-        exec_globals = {}
-        exec(secret_years, exec_globals)
-        YEARS_MEANING = exec_globals.get("YEARS_MEANING", {})
-        app.logger.debug(f"YEARS_MEANING keys: {list(YEARS_MEANING.keys())}")
-    else:
-        YEARS_MEANING = {}
-        app.logger.warning("YEARS_DATA is empty")
-except Exception as e:
-    app.logger.error(f"Error loading YEARS_DATA: {str(e)}")
-    raise
+SYLLABLES_TWO = load_and_exec_secret(SYLLABLES_PATH, "SYLLABLES_TWO")
+SYLLABLES_THREE = load_and_exec_secret(SYLLABLES_PATH, "SYLLABLES_THREE")
+YEARS_MEANING = load_and_exec_secret(YEARS_PATH, "YEARS_MEANING")
 
 @app.route('/', methods=['GET'])
 def home():
-    app.logger.debug("Received request to /")
-    return jsonify({"message": "Welcome to Keynest API! Use /generate to create a password or /check to evaluate a password."}), 200
+    return jsonify({
+        "message": "Welcome to Keynest API! Use /generate to create a password or /check to evaluate a password."
+    }), 200
 
 @app.route('/generate', methods=['POST'])
 def generate_password():
-    try:
-        app.logger.debug("Received /generate request")
-        data = request.get_json()
-        if not data:
-            app.logger.error("No JSON data received")
-            return jsonify({'error': 'No JSON data received'}), 400
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No JSON data received'}), 400
 
+    try:
         seed = data.get('seed', '').strip()
         syllables = int(data.get('syllables', 2))
         include_numbers = data.get('numbers', False)
         include_symbols = data.get('symbols', False)
 
-        app.logger.debug(f"Request data: {data}")
-        app.logger.debug(f"Parsed: syllables={syllables}, numbers={include_numbers}, symbols={include_symbols}")
-
-        seed_suffix = ''
-        if seed:
-            try:
-                translated = GoogleTranslator(source='auto', target='en').translate(seed)
-                seed_suffix = translated[:3].lower()
-                app.logger.debug(f"Seed '{seed}' translated to '{translated}', using suffix '{seed_suffix}'")
-            except Exception as e:
-                app.logger.warning(f"Seed translation failed: {e}")
-
         if not SYLLABLES_TWO or not SYLLABLES_THREE:
-            app.logger.error("SYLLABLES_TWO or SYLLABLES_THREE is empty")
             return jsonify({'error': 'Syllables dictionaries are empty'}), 500
         if include_numbers and not YEARS_MEANING:
-            app.logger.error("YEARS_MEANING is empty")
             return jsonify({'error': 'Years dictionary is empty'}), 500
 
+        seed_suffix = get_seed_suffix(seed)
         password, associations = generate_password_logic(
             syllables, include_numbers, include_symbols, seed_suffix
         )
 
         return jsonify({'password': password, 'associations': associations}), 200
 
-    except ValueError as ve:
-        app.logger.error(f"ValueError in /generate: {str(ve)}")
+    except ValueError:
         return jsonify({'error': 'Invalid syllables value, must be an integer'}), 400
     except Exception as e:
-        app.logger.error(f"Error in /generate: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-    
-    
+@app.route('/check', methods=['POST'])
+def check_password():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No JSON data received'}), 400
+
+    password = data.get('password', '')
+    if not isinstance(password, str):
+        return jsonify({'error': 'Password must be a string'}), 400
+
+    try:
+        result = evaluate_password(password)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def get_seed_suffix(seed):
+    if not seed:
+        return ""
+    try:
+        translated = GoogleTranslator(source='auto', target='en').translate(seed)
+        return translated[:3].lower()
+    except Exception:
+        return ""
+
 def generate_password_logic(syllables, include_numbers, include_symbols, seed_suffix=""):
     syllables_list = []
     associations = []
 
     for _ in range(syllables):
-        if random.choice([True, False]):
-            key = random.choice(list(SYLLABLES_TWO.keys()))
-            value = SYLLABLES_TWO[key]
-        else:
-            key = random.choice(list(SYLLABLES_THREE.keys()))
-            value = SYLLABLES_THREE[key]
+        use_two = random.choice([True, False])
+        dictionary = SYLLABLES_TWO if use_two else SYLLABLES_THREE
+        key = random.choice(list(dictionary.keys()))
         syllables_list.append(key)
-        associations.append(value)
+        associations.append(dictionary[key])
 
     password = "-".join(syllables_list)
 
@@ -150,41 +122,12 @@ def generate_password_logic(syllables, include_numbers, include_symbols, seed_su
 
     if seed_suffix:
         if random.choice([True, False]):
-            password = seed_suffix + password
+            password = f"{seed_suffix}-{password}"
         else:
-            password = password + seed_suffix
-        associations.append(f"сиед: {seed_suffix}")
+            password = f"{password}{seed_suffix}"
+        associations.append(f"сид: {seed_suffix}")
 
     return password, associations
-
-
-
-@app.route('/check', methods=['POST'])
-def check_password():
-    try:
-        app.logger.debug("Received /check request")
-        data = request.get_json()
-        if not data:
-            app.logger.error("No JSON data received")
-            return jsonify({'error': 'No JSON data received'}), 400
-
-        app.logger.debug(f"Request data: {data}")
-        password = data.get('password', '')
-        if not isinstance(password, str):
-            app.logger.error("Password must be a string")
-            return jsonify({'error': 'Password must be a string'}), 400
-
-        app.logger.debug(f"Password to check: {password}")
-        result = evaluate_password(password)
-        app.logger.debug(f"Check result: {result}")
-        
-        return jsonify(result), 200
-
-    except Exception as e:
-        app.logger.error(f"Error in /check: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-
 
 def evaluate_password(password):
     score = 1
@@ -192,36 +135,29 @@ def evaluate_password(password):
 
     if len(password) > 12:
         score *= 10
-    elif 12 >= len(password) >= 8:
+    elif len(password) >= 8:
         score *= 5
-    elif 8 > len(password) > 5:
+    elif len(password) > 5:
         score *= 2
 
     if re.search(r"\d", password):
         score *= 10
-        
     if re.search(r"[A-Z]", password):
         score *= 10
-
     if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         score *= 10
 
     leak_count = is_in_leaked_database(password)
     if leak_count > 0:
-        score *= 0
-        suggestions.append(
-            f"Этот пароль найден в базе утечек {leak_count:,} раз(а)."
-        )
+        score = 0
+        suggestions.append(f"Этот пароль найден в базе утечек {leak_count:,} раз(а).")
 
     if score >= 5000:
-        strength = "Надежный"
-        time = "много лет"
+        strength, time = "Надежный", "много лет"
     elif score >= 100:
-        strength = "Средний"
-        time = "несколько дней"
+        strength, time = "Средний", "несколько дней"
     else:
-        strength = "Слабый"
-        time = "несколько минут"
+        strength, time = "Слабый", "несколько минут"
 
     return {
         "strength": strength,
@@ -230,30 +166,21 @@ def evaluate_password(password):
     }
 
 def is_in_leaked_database(password):
-    try:
-        sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
-        prefix = sha1[:5]
-        suffix = sha1[5:]
+    sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    prefix, suffix = sha1[:5], sha1[5:]
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
 
-        url = f"https://api.pwnedpasswords.com/range/{prefix}"
-        res = requests.get(url)
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise RuntimeError(f"Pwned Passwords API error: {response.status_code}")
 
-        if res.status_code != 200:
-            raise RuntimeError(f"Ошибка при обращении к pwnedpasswords API: {res.status_code}")
+    hashes = (line.split(":") for line in response.text.splitlines())
+    for hash_suffix, count in hashes:
+        if hash_suffix == suffix:
+            return int(count)
 
-        hashes = (line.split(":") for line in res.text.splitlines())
-        
-        for h, count in hashes:
-            if h == suffix:
-                return int(count)
-
-        return 0
-    except Exception as e:
-        app.logger.error(f"Error in is_in_leaked_database: {str(e)}")
-        raise
+    return 0
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))
-    app.logger.debug(f"Starting server on port {port}")
     app.run(debug=False, host="0.0.0.0", port=port)
-    app.logger.debug("Server started successfully")
