@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Donate.css";
+import Footer from "../components/Footer";
 import Navigation from "../components/Navigation";
 
 function Home() {
@@ -15,14 +16,7 @@ function Home() {
           <h2>Поддержать проект</h2>
           <p>По сколько наш проект является бесплатным, вы можете поддержать его по ссылке: *появится позже*</p>
         </section>
-
-        <footer className="footer">
-        <p>© 2025 Keynest</p>
-        <a href="https://github.com/mtferma/keynest" target="_blank" rel="noopener noreferrer">GitHub</a> | 
-        <a href="https://t.me/keynest_support" target="_blank" rel="noopener noreferrer">Telegram Support</a> | 
-        <a href="http://keynest.ru/donate" target="_blank" rel="noopener noreferrer">Donate</a>  
-      </footer>
-
+        <Footer />
       </div>
     );
   }

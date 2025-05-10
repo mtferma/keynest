@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import "../styles/Generate.css";
 import Navigation from "../components/Navigation";
-import { API_URL } from '../config';
+import Footer from "../components/Footer";
+import { API_URL } from "../config";
+import "../styles/Generate.css";
 
-function App() {
-  const [value, setValue] = useState(5);
+function GeneratePage() {
+  const [seed, setSeed] = useState("");
+  const [syllableCount, setSyllableCount] = useState(5);
   const [includeNumbers, setIncludeNumbers] = useState(false);
   const [includeSymbols, setIncludeSymbols] = useState(false);
   const [password, setPassword] = useState("");
@@ -13,39 +15,35 @@ function App() {
 
   const marks = [2, 3, 4, 5, 6];
 
-  const handleChange = (e) => {
-    setValue(parseFloat(e.target.value));
+  const handleSliderChange = (e) => {
+    setSyllableCount(parseFloat(e.target.value));
   };
 
-  const handleMouseUp = () => {
-    const snapped = Math.round(value);
-    setValue(snapped);
+  const snapSlider = () => {
+    setSyllableCount(Math.round(syllableCount));
+  };
+
+  const handleCheckboxToggle = (setter) => () => {
+    setter((prev) => !prev);
   };
 
   const generatePassword = async () => {
-    try {
-      // Запрос на сервер для генерации пароля
+
       const response = await fetch(`${API_URL}/generate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          syllables: value,
+          syllables: syllableCount,
           numbers: includeNumbers,
           symbols: includeSymbols,
+          seed: seed.trim(),
         }),
       });
-  
+
       const data = await response.json();
-  
       setPassword(data.password);
       setAssociations(data.associations || []);
-    } catch (error) {
-      console.error("Ошибка генерации:", error);
-    }
   };
-  
 
   const copyToClipboard = () => {
     if (password) {
@@ -55,13 +53,14 @@ function App() {
   };
 
   return (
-    <div className="App">
-          <Navigation />
+    <div className="generate-page">
+      <Navigation />
 
-      <h1>Keynest</h1>
-      <p className="home-subtitle" style={{ textAlign: "center", fontSize: "18px", marginBottom: "30px" }}>
-        Запоминающиеся пароли. Безопасно. Просто.
-      </p>
+      <header className="header">
+        <h1>Keynest</h1>
+        <p className="hosubtitle">Запоминающиеся пароли. Безопасно. Просто.</p>
+      </header>
+
       <div className="about-section">
         Keynest создаёт запоминающиеся пароли из слогов. Выбирай длину, добавляй цифры и символы — получай надёжный пароль.
       </div>
@@ -72,90 +71,78 @@ function App() {
           <img src="/copyIcon.png" alt="copy icon" />
         </button>
       </div>
+
       {associations.length > 0 && (
-  <div>
-    <div
-      className="associations-toggle"
-      onClick={() => setShowAssociations(!showAssociations)}
-    >
-      <p style={{ fontWeight: 700, fontSize: 20, cursor: "pointer" }}>
-        Ассоциации {showAssociations ? "▲" : "▼"}
-      </p>
-    </div>
+        <div>
+          <div className="associations-toggle" onClick={() => setShowAssociations(!showAssociations)}>
+            <p className="associations-title">Ассоциации {showAssociations ? "▲" : "▼"}</p>
+          </div>
+          <div className={`associations-box ${showAssociations ? "open" : "closed"}`}>
+            <ul>
+              {associations.map((assoc, index) => (
+                <li key={index}>{assoc}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
-    <div
-      className={`associations-box ${showAssociations ? "open" : "closed"}`}
-    >
-      <ul>
-        {associations.map((assoc, index) => (
-          <li key={index}>{assoc}</li>
-        ))}
-      </ul>
-    </div>
-  </div>
-)}
-
-
-      <p>Количество слогов</p>
-      <div className="slider-container">
-        <input
-          type="range"
-          min="2"
-          max="6"
-          step="0.01"
-          value={value}
-          onChange={handleChange}
-          onMouseUp={handleMouseUp}
-          onTouchEnd={handleMouseUp}
-          className="slider"
-          style={{ '--value': value }}
-        />
-
-        <div className="marks">
-          {marks.map((mark) => (
-            <div key={mark} className="mark">
-              <div className="dot" />
-              <span>{mark}</span>
-            </div>
-          ))}
+      <div className="slider-section">
+        <p>Количество слогов</p>
+        <div className="slider-container">
+          <input
+            type="range"
+            min="2"
+            max="6"
+            step="0.01"
+            value={syllableCount}
+            onChange={handleSliderChange}
+            onMouseUp={snapSlider}
+            onTouchEnd={snapSlider}
+            className="slider"
+            style={{ "--value": syllableCount }}
+          />
+          <div className="marks">
+            {marks.map((mark) => (
+              <div key={mark} className="mark">
+                <div className="dot" />
+                <span>{mark}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div
-        className="checkbox-container"
-        onClick={() => setIncludeNumbers(!includeNumbers)}
-      >
-        <input
-          type="checkbox"
-          checked={includeNumbers}
-          onChange={() => setIncludeNumbers(!includeNumbers)}
-        />
+      <div className="checkbox-container" onClick={handleCheckboxToggle(setIncludeNumbers)}>
+        <input type="checkbox" checked={includeNumbers} onChange={() => {}} />
         <label>Добавить цифры</label>
       </div>
 
-      <div
-        className="checkbox-container"
-        onClick={() => setIncludeSymbols(!includeSymbols)}
-      >
-        <input
-          type="checkbox"
-          checked={includeSymbols}
-          onChange={() => setIncludeSymbols(!includeSymbols)}
-        />
+      <div className="checkbox-container" onClick={handleCheckboxToggle(setIncludeSymbols)}>
+        <input type="checkbox" checked={includeSymbols} onChange={() => {}} />
         <label>Добавить символы</label>
+      </div>
+    
+
+      <div className="seed-container">
+        <label htmlFor="seed-input">Seed (необязательное слово):</label>
+        <input
+          id="seed-input"
+          type="text"
+          value={seed}
+          onChange={(e) => setSeed(e.target.value)}
+          placeholder="например: mountain"
+          className="seed-input"
+        />
       </div>
 
       <button className="generate-button" onClick={generatePassword}>
         ГЕНЕРИРОВАТЬ
       </button>
-      <footer className="footer">
-        <p>© 2025 Keynest</p>
-        <a href="https://github.com/mtferma/keynest" target="_blank" rel="noopener noreferrer">GitHub</a> | 
-        <a href="https://t.me/keynest_support" target="_blank" rel="noopener noreferrer">Telegram Support</a> | 
-        <a href="http://keynest.ru/donate" target="_blank" rel="noopener noreferrer">Donate</a>    
-      </footer>
+
+      <Footer />
     </div>
   );
 }
 
-export default App;
+export default GeneratePage;

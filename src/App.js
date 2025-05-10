@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Generate from "./pages/Generate";
 import Donate from "./pages/Donate"
-import Check from "./pages/check";
+import Check from "./pages/Check";
 
 function App() {
   return (

@@ -12,7 +12,7 @@ body, html {
   user-select: none;
 }
 
-.App {
+.generate-page {
   margin: 40px auto;
   padding: 30px 20px;
   max-width: 620px;
@@ -191,27 +191,6 @@ p {
   border-radius: 6px;
 }
 
-.footer {
-  border-top: 4px solid #000;
-  padding-top: 15px;
-  text-align: center;
-  font-size: 14px;
-  color: #010101;
-  margin-top: 30px;
-}
-
-.footer a {
-  color: #010101;
-  text-decoration: none;
-  font-weight: bold;
-  margin: 0 8px;
-}
-
-.footer a:hover {
-  text-decoration: underline;
-  color: #2dd1a3;
-}
-
 .associations-box {
   text-align: left;
   margin-top: 15px;
@@ -253,4 +232,16 @@ p {
 .associations-box.open {
   max-height: 500px;
   opacity: 1;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.associations-title {
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
 }

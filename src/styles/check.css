@@ -76,7 +76,8 @@
     align-items: center;
     justify-content: center;
     cursor: help;
-    font-weight: bold;
+    font-weight: 500;
+    color: #404040;
   }
   
   .tooltip-text {
@@ -85,7 +86,7 @@
     background-color: #fff;
     color: #000;
     text-align: left;
-    border: 1px solid #aaa;
+    border: 2px solid #000;
     padding: 8px;
     border-radius: 6px;
     position: absolute;

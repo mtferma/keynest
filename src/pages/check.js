@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Navigation from "../components/Navigation";
-import "../styles/check.css";
+import "../styles/Check.css";
 import { API_URL } from '../config';
+import Footer from "../components/Footer";
 
 function Check() {
   const [password, setPassword] = useState("");
@@ -20,12 +21,11 @@ function Check() {
 
   return (
     <div className="check-page">
-    
       <Navigation />
       <h1>Keynest</h1>
       <p className="main-subtitle" style={{ textAlign: "center", fontSize: "18px", marginBottom: "30px" }}>
           Запоминающиеся пароли. Безопасно. Просто.
-        </p>
+      </p>
       <div className="check-form">
         <input
           type="password"
@@ -33,15 +33,14 @@ function Check() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-  <button onClick={handleCheck}>Проверить</button>
-  <div className="tooltip-container">
-    <span className="tooltip-icon">?</span>
-    <div className="tooltip-text">
-      Мы проверяем пароль по базе утечек, оцениваем его длину, наличие цифр, символов и шаблонов. Все данные остаются на клиенте.
-    </div>
-  </div>
-</div>
-
+        <button onClick={handleCheck}>Проверить</button>
+        <div className="tooltip-container">
+          <span className="tooltip-icon">?</span>
+            <div className="tooltip-text">
+              Мы проверяем пароль по базе утечек, оцениваем его длину, наличие цифр, символов и шаблонов.
+            </div>
+          </div>
+        </div>
       </div>
 
       {result && (
@@ -57,12 +56,7 @@ function Check() {
           )}
         </div>
       )}
-      <footer className="footer">
-        <p>© 2025 Keynest</p>
-        <a href="https://github.com/mtferma/keynest" target="_blank" rel="noopener noreferrer">GitHub</a> | 
-        <a href="https://t.me/keynest_support" target="_blank" rel="noopener noreferrer">Telegram Support</a> | 
-        <a href="http://keynest.ru/donate" target="_blank" rel="noopener noreferrer">Donate</a>    
-      </footer>
+      <Footer />
     </div>
   );
 }

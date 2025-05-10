@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../styles/Home.css";
 import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
+import "../styles/Home.css";
 
-function Home() {
+function HomePage() {
   return (
     <div className="home">
-    <Navigation />
-      <h1 className="home-title" >Keynest</h1>
-      <p className="home-subtitle" style={{ textAlign: "center", fontSize: "18px", marginBottom: "30px" }}>
-        Запоминающиеся пароли. Безопасно. Просто.
-      </p>
+      <Navigation />
+      <header className="home-header">
+        <h1 className="home-title">Keynest</h1>
+        <p className="home-subtitle">
+          Запоминающиеся пароли. Безопасно. Просто.
+        </p>
+      </header>
 
       <section className="home-section">
         <h2>О проекте</h2>
@@ -37,18 +40,12 @@ function Home() {
       <section className="home-section">
         <h2>Надёжно и безопасно</h2>
         <p>
-          Мы не сохраняем ни один из сгенерированных или проверяемых паролей. Всё происходит локально в твоём браузере или через наше расширение. Генерация паролей использует открытый API, а исходный код проекта доступен на GitHub — ты можешь лично убедиться в прозрачности и безопасности. Мы используем современные криптографические методы, чтобы гарантировать, что твои данные никогда не покинут устройство. Keynest — это твой контроль над безопасностью.
-        </p>
+          Мы не сохраняем ни один из сгенерированных или проверяемых паролей. Всё происходит локально — в твоём браузере или через наше расширение. Генерация паролей использует открытый API, а исходный код проекта доступен на GitHub — ты можешь лично убедиться в прозрачности и безопасности. Keynest — это твой контроль над безопасностью.        </p>
       </section>
 
-      <footer className="footer">
-        <p>© 2025 Keynest</p>
-        <a href="https://github.com/mtferma/keynest" target="_blank" rel="noopener noreferrer">GitHub</a> | 
-        <a href="https://t.me/keynest_support" target="_blank" rel="noopener noreferrer">Telegram Support</a> | 
-        <a href="http://keynest.ru/donate" target="_blank" rel="noopener noreferrer">Donate</a>    
-      </footer>
+      <Footer />
     </div>
   );
 }
 
-export default Home;
+export default HomePage;

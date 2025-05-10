@@ -6,8 +6,8 @@ import hashlib
 import requests
 import os
 import logging
+from deep_translator import GoogleTranslator
 
-# Настройка логирования
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 CORS(app, resources={
@@ -22,7 +22,6 @@ CORS(app, resources={
     }
 })
 
-# Логируем запуск приложения
 app.logger.debug("Starting Flask application...")
 def load_secret_file(path):
     try:
@@ -32,18 +31,15 @@ def load_secret_file(path):
         app.logger.error(f"Failed to read secret file at {path}: {e}")
         return ""
 
-# Пути к секретным файлам
 SYLLABLES_PATH = "/etc/secrets/SYLLABLES_DATA"
 YEARS_PATH = "/etc/secrets/YEARS_DATA"
 
-# Загрузка данных
 secret_syllables = load_secret_file(SYLLABLES_PATH)
 secret_years = load_secret_file(YEARS_PATH)
 
-# Логгирование успешности загрузки
 app.logger.debug(f"Loaded SYLLABLES_DATA: {bool(secret_syllables)}")
 app.logger.debug(f"Loaded YEARS_DATA: {bool(secret_years)}")
-# Инициализируем словари
+
 try:
     if secret_syllables:
         exec_globals = {}
@@ -80,6 +76,15 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate_password():
+    seed = data.get('seed', '').strip()
+    seed_suffix = ''
+    if seed:
+        try:
+            translated = GoogleTranslator(source='auto', target='en').translate(seed)
+            seed_suffix = translated[:3].lower()
+            app.logger.debug(f"Seed '{seed}' translated to '{translated}', using suffix '{seed_suffix}'")
+        except Exception as e:
+            app.logger.warning(f"Seed translation failed: {e}")
     try:
         app.logger.debug("Received /generate request")
         data = request.get_json()
@@ -101,8 +106,9 @@ def generate_password():
             app.logger.error("YEARS_MEANING is empty")
             return jsonify({'error': 'Years dictionary is empty'}), 500
 
-        password, associations = generate_password_logic(syllables, include_numbers, include_symbols)
-        app.logger.debug(f"Generated password: {password}, associations: {associations}")
+        password, associations = generate_password_logic(
+            syllables, include_numbers, include_symbols, seed_suffix
+        )
         
         return jsonify({'password': password, 'associations': associations}), 200
 
@@ -112,6 +118,44 @@ def generate_password():
     except Exception as e:
         app.logger.error(f"Error in /generate: {str(e)}")
         return jsonify({'error': str(e)}), 500
+    
+    
+def generate_password_logic(syllables, include_numbers, include_symbols, seed_suffix=""):
+    syllables_list = []
+    associations = []
+
+    for _ in range(syllables):
+        if random.choice([True, False]):
+            key = random.choice(list(SYLLABLES_TWO.keys()))
+            value = SYLLABLES_TWO[key]
+        else:
+            key = random.choice(list(SYLLABLES_THREE.keys()))
+            value = SYLLABLES_THREE[key]
+        syllables_list.append(key)
+        associations.append(value)
+
+    password = "-".join(syllables_list)
+
+    if include_numbers:
+        year = random.choice(list(YEARS_MEANING.keys()))
+        password += str(year)
+        associations.append(YEARS_MEANING[year])
+
+    if include_symbols:
+        symbol = random.choice(["!", "%", "@", "#", "&", "?"])
+        password += symbol
+        associations.append("спецсимвол")
+
+    if seed_suffix:
+        if random.choice([True, False]):
+            password = seed_suffix + password
+        else:
+            password = password + seed_suffix
+        associations.append(f"сиед: {seed_suffix}")
+
+    return password, associations
+
+
 
 @app.route('/check', methods=['POST'])
 def check_password():
@@ -138,33 +182,7 @@ def check_password():
         app.logger.error(f"Error in /check: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-def generate_password_logic(syllables, include_numbers, include_symbols):
-    syllables_list = []
-    associations = []
 
-    for _ in range(syllables):
-        if random.choice([True, False]):
-            key = random.choice(list(SYLLABLES_TWO.keys()))
-            value = SYLLABLES_TWO[key]
-        else:
-            key = random.choice(list(SYLLABLES_THREE.keys()))
-            value = SYLLABLES_THREE[key]
-        syllables_list.append(key)
-        associations.append(value)
-
-    password = "-".join(syllables_list)
-
-    if include_numbers:
-        year = random.choice(list(YEARS_MEANING.keys()))
-        password += str(year)
-        associations.append(YEARS_MEANING[year])
-
-    if include_symbols:
-        symbol = random.choice(["!", "%", "@", "#", "&", "?"])
-        password += symbol
-        associations.append("спецсимвол")
-
-    return password, associations
 
 def evaluate_password(password):
     score = 1
