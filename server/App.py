@@ -76,7 +76,6 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate_password():
-    seed = data.get('seed', '').strip()
     seed_suffix = ''
     if seed:
         try:
@@ -91,6 +90,8 @@ def generate_password():
         if not data:
             app.logger.error("No JSON data received")
             return jsonify({'error': 'No JSON data received'}), 400
+        
+        seed = data.get('seed', '').strip()
 
         app.logger.debug(f"Request data: {data}")
         syllables = int(data.get('syllables', 2))
