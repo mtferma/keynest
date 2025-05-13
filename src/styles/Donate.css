@@ -1,0 +1,96 @@
+.main {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 30px;
+    font-family: 'Space Mono', monospace;
+    background: #f6f5f8;
+    border: 4px solid #000;
+    border-radius: 8px;
+    box-shadow: 8px 8px 0 #404040;
+  }
+  
+  .main-title {
+    font-size: 40px;
+    text-align: center;
+    margin: 0 auto 20px;
+    background: #2dd1a3;
+    border: 4px solid #000;
+    padding: 12px;
+    box-shadow: 6px 6px 0 #404040;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+  }
+  
+ 
+  .main-subtitle {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #000;
+  }
+  
+  .donate {
+    margin-bottom: 30px;
+    padding: 25px;
+    border: 4px solid #000;
+    background: #fafafa;
+    box-shadow: 5px 5px 0 #404040;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+  }
+  
+  .donate h2 {
+    font-size: 26px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .donate p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 5px;
+    color: #010101;
+  }
+
+  @media screen and (max-width: 768px) {
+  body, html {
+    font-size: 16px; /* Slightly smaller base font size for mobile */
+    letter-spacing: 0.8px;
+  }
+
+  .main {
+    margin: 20px 10px;
+    padding: 20px;
+    max-width: 100%;
+    box-shadow: 6px 6px 0 #404040;
+  }
+
+  .main-title {
+    font-size: 32px;
+    padding: 10px;
+    box-shadow: 4px 4px 0 #404040;
+  }
+
+  .main-subtitle {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .donate {
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 4px 4px 0 #404040;
+  }
+
+  .donate h2 {
+    font-size: 22px;
+  }
+
+  .donate p {
+    font-size: 14px;
+  }
+  }
