@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'Menlo';
+  src: url('/public/fonts/menlo-bold.woff2') format('woff2'),
+       url('/public/fonts/menlo-bold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 .nav {
     display: flex;
     justify-content: center;
@@ -6,7 +15,7 @@
   }
   
   .nav-link {
-    font-family: 'Space Mono', monospace;
+    font-family: Menlo, monospace;
     font-weight: bold;
     font-size: 16px;
     padding: 10px 15px;

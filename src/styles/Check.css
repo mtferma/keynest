@@ -1,8 +1,21 @@
+@font-face {
+  font-family: 'Menlo';
+  src: url('/public/fonts/menlo-bold.woff2') format('woff2'),
+       url('/public/fonts/menlo-bold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Menlo', monospace;
+}
+
+
 .check-page {
   max-width: 600px;
   margin: 40px auto;
   padding: 30px;
-  font-family: 'Space Mono', monospace;
+  font-family: Menlo, monospace;
   background: #f6f5f8;
   border: 4px solid #000;
   border-radius: 6px;
