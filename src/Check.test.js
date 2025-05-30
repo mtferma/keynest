@@ -2,11 +2,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Check from './pages/Check';
 import { API_URL } from './config';
 
-// Мокаем Navigation и Footer
 jest.mock('./components/Navigation', () => () => <div>Навигация</div>);
 jest.mock('./components/Footer', () => () => <div>Футер</div>);
 
-// Мокаем fetch API
 global.fetch = jest.fn();
 
 describe('CheckPage', () => {
