@@ -106,10 +106,11 @@ npm start
 ```json
 {
     "password": "testpassword123"
-}```
+}
+```
 
 - **Ответ**:
-    ```json
+```json
 {
     "strength": "Надежный",
     "time": "100 лет",
